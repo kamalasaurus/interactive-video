@@ -1,0 +1,218 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Interactive Video Example</title>
+  <style>
+    body {
+      font-family: Liberation Sans, Arial, sans-serif;
+      background-color: #fffaf7;
+      font-size: 9pt;
+      line-height: 1.5;
+      background-color: black;
+      color: white;
+    }
+    main {
+      max-width: 100ch;
+      padding: 3.5ch;
+      margin: auto;
+      text-align: center;
+    }
+    h3 {
+      margin-bottom: 1ch;
+    }
+    section {
+      margin-bottom: 3.5ch;
+    }
+    footer {
+      text-align: center;
+      color: #aaa;
+    }
+    a {
+      color: #666;
+      outline: 0;
+    }
+    ::selection {
+      background-color: #fff888;
+    }
+    .footer {
+      max-width: 100ch;
+      margin: auto;
+      text-align: right;
+    }
+    .player {
+      position: relative;
+      width: 100%;
+    }
+    .overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      text-align: center;
+    }
+    .overlay div {
+      position: relative;
+      background-color: black;
+      border: solid 1px #ddd;
+      color: #ddd;
+      font-size: 24px;
+      padding: 12px;
+      margin: 60px auto;
+      width: 300px;
+    }
+    video {
+      width: 100% !important;
+      height: auto !important;
+    }
+  </style>
+</head>
+<body>
+  <main role="main">
+    <h3>
+      Interactive Video!
+    </h3>
+    <section>
+      <div class="player">
+        <video controls muted autoplay>
+          <source id="first" src="./open_door.m4v" type="video/mp4"></source>
+        </video>
+        <source id="second1" src="./pizza.m4v" type="video/mp4"></source>
+        <source id="second2" src="./tacos.m4v" type="video/mp4"></source>
+        <source id="third" src="./subway.m4v" type="video/mp4"></source>
+      </div>
+    </section>
+  </main>
+  <footer>
+    <div class="footer">
+      Example to demo HTML5 video api for interactive video.
+    </div>
+  </footer>
+  <script>
+    void function() {
+      const player = document.querySelector('.player');
+      const video = document.querySelector('video');
+      let current_src = document.querySelector('video source');
+      let olay = document.createElement('div');
+
+      const firstTemplate = `
+        <div id="pizza">grab a slice!</div>
+        <div id="taco">rustle up some tacos!</div>
+      `;
+
+      const secondTemplate = `
+        <div id="subway">oh crap!  I forgot my wallet...  and I'm supposed to meet Lea in Dumbo!</div>
+      `;
+
+      const thirdTemplate = `
+        <div> ...will I find my misplaced wallet? </div>
+        <div> ...will I meet Lea before the beer runs out? </div>
+        <div> find out next time </div>
+        <div> on aimless adventures! </div>
+      `;
+
+      function nextVideo(event) {
+        switch (event.target.id) {
+          case 'pizza':
+            player.appendChild(current_src);
+            video.appendChild(second1);
+            video.load();
+            video.play();
+            break;
+          case 'taco':
+            player.appendChild(current_src);
+            video.appendChild(second2);
+            video.load();
+            video.play();
+            break;
+          case 'subway':
+            player.appendChild(current_src);
+            video.appendChild(third);
+            video.load();
+            video.play();
+            break;
+          default:
+            break;
+        }
+      };
+
+      function show(element) {
+        element.setAttribute('style', 'display: block;');
+      };
+
+      function hide(element) {
+        element.setAttribute('style', 'display: none;');
+      };
+
+      function clickEvents(overlay) {
+        overlay.addEventListener('mousedown', nextVideo);
+        overlay.addEventListener('touchstart', nextVideo);
+      };
+
+      function timedEvents(overlay) {
+        const children = Array.from(overlay.children);
+        children.forEach(hide)
+        setTimeout(() => {
+          children.forEach((el, i) => {
+            if (i === 0) show(el);
+            else hide(el);
+          });
+        }, 0);
+        setTimeout(() => {
+          children.forEach((el, i) => {
+            if (i === 1) show(el);
+            else hide(el);
+          });
+        }, 1200);
+        setTimeout(() => {
+          children.forEach((el, i) => {
+            if (i === 2) show(el);
+            else hide(el);
+          });
+        }, 2400);
+        setTimeout(() => {
+          children.forEach((el, i) => {
+            if (i === 3) show(el);
+            else hide(el);
+          });
+        }, 3600);
+      };
+
+      function addOverlay(id) {
+        const overlay = document.createElement('div')
+          overlay.classList.add('overlay')
+        switch (id) {
+          case 'first':
+            overlay.innerHTML = firstTemplate;
+            clickEvents(overlay);
+            break;
+          case 'second1':
+          case 'second2':
+            overlay.innerHTML = secondTemplate;
+            clickEvents(overlay);
+            break;
+          case 'third':
+            overlay.innerHTML = thirdTemplate;
+            timedEvents(overlay);
+            break;
+          default:
+            break;
+        }
+        return overlay;
+      }
+
+      video.addEventListener('play', () => {
+        olay.remove();
+      });
+
+      video.addEventListener('ended', () => {
+        current_src = document.querySelector('video source');
+        olay = addOverlay(current_src.id);
+        player.appendChild(olay);
+      });
+    }();
+  </script>
+</body>
+</html>
+
